@@ -91,7 +91,7 @@ class Mariadb < Formula
 
     # Fix my.cnf to point to #{etc} instead of /etc
     (etc/"my.cnf.d").mkpath
-    inreplace "#{etc}/mariadb.cnf", "!includedir /etc/my.cnf.d",
+    inreplace "#{etc}/my.cnf", "!includedir /etc/my.cnf.d",
                                "!includedir #{etc}/my.cnf.d"
     touch etc/"my.cnf.d/.homebrew_dont_prune_me"
 
@@ -124,7 +124,7 @@ class Mariadb < Formula
     end
 
     # Install my.cnf that binds to 127.0.0.1 by default
-    (buildpath/"mariadb.cnf").write <<-EOS.undent
+    (buildpath/"my.cnf").write <<-EOS.undent
       [mysql]
       port                           = 3307
       socket                         = /tmp/mariadb.sock
@@ -179,7 +179,7 @@ class Mariadb < Formula
       #general_log_file = /usr/local/var/mariadb_mysql/query.log
       #general_log      = 1
     EOS
-    etc.install "mariadb.cnf"
+    etc.install "my.cnf"
   end
 
   def post_install
