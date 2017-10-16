@@ -128,7 +128,7 @@ class Mariadb < Formula
   def post_install
     # Make sure the var/mysql directory exists
     touch "#{etc}/mariadb.cnf"
-    ("#{etc}/mariadb.cnf").write <<-EOS.undent
+    ("/usr/local/etc/mariadb.cnf").write <<-EOS.undent
       [mysql]
       port                           = 3307
       socket                         = /tmp/mariadb.sock
