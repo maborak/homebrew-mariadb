@@ -136,6 +136,7 @@ class Mariadb < Formula
 
   def post_install
     # Make sure the var/mysql directory exists
+    touch "#{etc}/mariadb.cnf"
     (var/"mariadb_mysql").mkpath
     unless File.exist? "#{var}/mariadb_mysql/mysql/user.frm"
       ENV["TMPDIR"] = nil
