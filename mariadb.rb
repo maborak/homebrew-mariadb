@@ -94,7 +94,6 @@ class Mariadb < Formula
     inreplace "#{etc}/my.cnf", "!includedir /etc/my.cnf.d",
                                "!includedir #{etc}/my.cnf.d"
     touch etc/"my.cnf.d/.homebrew_dont_prune_me"
-    touch etc/"mariadb.cnf"
 
     # Don't create databases inside of the prefix!
     # See: https://github.com/Homebrew/homebrew/issues/4975
@@ -124,19 +123,66 @@ class Mariadb < Formula
                                "#{libexec}/wsrep_sst_common"
     end
 
-    # Install my.cnf that binds to 127.0.0.1 by default
-    (buildpath/"my.cnf").write <<-EOS.undent
-      # Default Homebrew MySQL server config
-      [mysqld]
-      # Only allow connections from localhost
-      bind-address = 127.0.0.2
-    EOS
-    etc.install "my.cnf"
   end
 
   def post_install
     # Make sure the var/mysql directory exists
     touch "#{etc}/mariadb.cnf"
+    ("#{etc}/mariadb.cnf").write <<-EOS.undent
+      [mysql]
+      port                           = 3307
+      socket                         = /tmp/mariadb.sock
+
+      [mysqld]
+      port                           = 3307
+      default_storage_engine         = InnoDB
+      socket                         = /tmp/mariadb.sock
+      pid_file                       = /usr/local/var/mariadb_mysql/mysql.pid
+      
+      # MyISAM #
+      key_buffer_size                = 532M
+      myisam_recover                 = FORCE,BACKUP
+      
+      # SAFETY #
+      max_allowed_packet             = 16M
+      max_connect_errors             = 1000000
+      skip_name_resolve
+      innodb                         = FORCE
+      
+      datadir                        = /usr/local/var/mariadb_mysql/
+      tmp_table_size                 = 128M
+      max_heap_table_size            = 532M
+      query_cache_type               = 1
+      query_cache_size               = 12M
+      max_connections                = 200
+      max_user_connections           = 200
+      #table_cache                    = 11500
+      #thread_cache_size              = 15121
+      #thread_cache_size              = 1000
+      open_files_limit               = 685535
+      table_definition_cache         = 4096
+      table_open_cache               = 10240
+      join_buffer_size               = 8M
+      read_buffer_size               = 8M
+      sort_buffer_size               = 8M
+      wait_timeout                   = 115800
+      connect_timeout                = 111000
+      bulk_insert_buffer_size        = 32M
+      key_buffer                     = 32M
+      
+      # INNODB #
+      innodb_flush_method            = O_DIRECT
+      innodb_log_files_in_group      = 2
+      innodb_log_file_size           = 512M
+      innodb_flush_log_at_trx_commit = 2
+      innodb_file_per_table          = 1
+      innodb_buffer_pool_size        = 2G
+      
+      # LOGGING #
+      log_error                      = /usr/local/var/mariadb_mysql/mysql-error.log
+      #general_log_file = /usr/local/var/mariadb_mysql/query.log
+      #general_log      = 1
+    EOS
     (var/"mariadb_mysql").mkpath
     unless File.exist? "#{var}/mariadb_mysql/mysql/user.frm"
       ENV["TMPDIR"] = nil
