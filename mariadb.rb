@@ -184,8 +184,8 @@ class Mariadb < Formula
 
   def post_install
     # Make sure the var/mysql directory exists
-    (var/"mysql").mkpath
-    unless File.exist? "#{var}/mysql/mysql/user.frm"
+    (var/"mariadb_mysql").mkpath
+    unless File.exist? "#{var}/mariadb_mysql/mysql/user.frm"
       ENV["TMPDIR"] = nil
       system "#{bin}/mysql_install_db", "--verbose", "--user=#{ENV["USER"]}",
         "--basedir=#{prefix}", "--datadir=#{var}/mariadb_mysql", "--tmpdir=/tmp"
@@ -193,7 +193,7 @@ class Mariadb < Formula
   end
 
   def caveats; <<-EOS.undent
-    A "/etc/my.cnf" from another install may interfere with a Homebrew-built
+    A "/etc/mariadb.cnf" from another install may interfere with a Homebrew-built
     server starting up correctly.
 
     MySQL is configured to only allow connections from localhost by default
